@@ -1,0 +1,49 @@
+	public int insert(Board board) throws SQLException {
+		int num = board.getNum();		
+		Connection conn = null;	PreparedStatement pstmt= null; 
+		int result = 0;			ResultSet rs = null;
+		String sql1 = "select nvl(max(num),0) from board";
+		String sql="insert into board values(?,?,?,?,?,?,?,?,?,?,?,sysdate)";
+		String sql2="update board set re_step = re_step+1 where " +
+			" ref=? and re_step > ?";
+		try {			
+			conn = getConnection();
+			if (num != 0) {
+				pstmt = conn.prepareStatement(sql2);
+				pstmt.setInt(1, board.getRef());
+				pstmt.setInt(2, board.getRe_step());
+				pstmt.executeUpdate();
+				pstmt.close();
+				board.setRe_step(board.getRe_step()+1);
+				board.setRe_level(board.getRe_level()+1);
+			}
+			pstmt = conn.prepareStatement(sql1);
+			rs = pstmt.executeQuery();
+			rs.next();
+			// key increase num + 1, mysql auto_increment or oracle sequence
+			// use sequence : values(sequence Name(board_seq).nextval,?,?...)
+			int number = rs.getInt(1) + 1;  
+			rs.close();   pstmt.close();
+			if (num == 0) board.setRef(number);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, number);
+			pstmt.setString(2, board.getWriter());
+			pstmt.setString(3, board.getSubject());
+			pstmt.setString(4, board.getContent());
+			pstmt.setString(5, board.getEmail());
+			pstmt.setInt(6, board.getReadcount());
+			pstmt.setString(7, board.getPasswd());
+			pstmt.setInt(8, board.getRef());
+			pstmt.setInt(9, board.getRe_step());
+			pstmt.setInt(10, board.getRe_level());
+			pstmt.setString(11, board.getIp());
+			result = pstmt.executeUpdate(); 
+		} catch(Exception e) {	System.out.println(e.getMessage()); 
+		} finally {
+			if (rs !=null) rs.close();
+			if (pstmt != null) pstmt.close();
+			if (conn !=null) conn.close();
+		}
+		return result;
+	}
+	
