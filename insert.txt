@@ -20,8 +20,8 @@
 			pstmt = conn.prepareStatement(sql1);
 			rs = pstmt.executeQuery();
 			rs.next();
-			// key increase num + 1, mysql auto_increment or oracle sequence
-			// use sequence : values(sequence Name(board_seq).nextval,?,?...)
+			// key인 num 1씩 증가, mysql auto_increment 또는 oracle sequence
+			// sequence를 사용 : values(시퀀스명(board_seq).nextval,?,?...)
 			int number = rs.getInt(1) + 1;  
 			rs.close();   pstmt.close();
 			if (num == 0) board.setRef(number);
